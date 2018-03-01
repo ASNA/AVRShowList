@@ -1,0 +1,98 @@
+﻿Using System
+Using System.Data
+Using System.Configuration
+Using System.Collections
+Using System.Web
+Using System.Web.Security
+Using System.Web.UI
+Using System.Web.UI.WebControls
+Using System.Web.UI.WebControls.WebParts
+Using System.Web.UI.HtmlControls
+
+BegClass Views_login Partial(*Yes) Access(*Public) Extends(System.Web.UI.Page)
+
+	DclDB DGDB DBName('*Public/Cypress') 
+	
+	BegFunc CheckIBMiCredentials Type(ASNA.DataGate.Common.dgException) 
+		DclSrParm User     Type(*String) 
+		DclSrParm Password Type(*String) 
+
+		DclFld Settings Type(DBSettings) 
+
+		DclFld x Type(*String) 
+
+		x = dbSelect.SelectedValue
+
+		Settings = Environments.GetDBSettings(dbSelect.SelectedValue) 
+
+		DGDB.User = User
+		DGDB.Password = Password
+		DGDB.Port = Settings.Port
+		DGDB.Server = Settings.Server 
+
+		Try 
+			Connect DGDB 
+			Call 'RPDREAM/SETENV' DB(DGDB) 
+			// Contents of this CL program
+			// PGM
+			//
+			//     MONMSG MsgID(CPF2103)
+			//	   ADDLIBLE rpMRData
+			//
+			// ENDPGM
+
+		Catch ex Type(ASNA.DataGate.Common.dgException)
+			LeaveSR ex 
+		Finally
+			Disconnect DGDB 
+		EndTry 
+
+		LeaveSr *Nothing 
+	EndFunc 
+
+    BegSr Page_Load Access(*Private) Event(*This.Load)
+        DclSrParm sender Type(*Object)
+        DclSrParm e Type(System.EventArgs)
+
+        If (NOT Page.IsPostBack)
+            //
+            // Called the first time that the page is loaded.
+            //
+        Else
+            //
+            // Called subsequent times that the page is displayed.
+            //
+        EndIf
+    EndSr
+
+    BegSr Page_Unload Access(*Private) Event(*This.Unload)
+        DclSrParm sender Type(*Object)
+        DclSrParm e Type(System.EventArgs)
+
+        //
+        // Called when the page is unloaded.
+        //
+    EndSr
+
+	BegSr buttonlogin_Click Access(*Private) Event(*This.buttonlogin.Click)
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(System.EventArgs)
+
+		DclFld ex Type(ASNA.DataGate.Common.dgException) 
+
+		ex = CheckIBMiCredentials(user.Text, password.Text)
+		If ex = *Nothing 
+			FormsAuthentication.RedirectFromLoginPage(user.Text, rememberme.Checked) 
+		Else 
+			// Show a detailed error message only if debug mode is on. 
+			If (context.Current.IsDebuggingEnabled)     
+				loginFailedValidator.ErrorMessage = ex.Message 
+				loginFailedValidator.IsValid = *False
+			Else 
+				LoginFailedValidator.ErrorMessage = 'Login failed'
+				loginFailedValidator.IsValid = *False				
+			EndIf
+		EndIf		
+	EndSr
+
+EndClass

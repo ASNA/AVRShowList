@@ -1,0 +1,92 @@
+﻿<%@ Master Language="AVR" AutoEventWireup="false" CodeFile="HomeMaster.master.vr" Inherits="HomeMaster" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head runat="server">
+    <title>Hello, world!</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        
+    <link rel="stylesheet" href="<%=Page.ResolveUrl("~")%>assets/vendors/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="<%=Page.ResolveUrl("~")%>assets/vendors/fontawesome/css/fontawesome-all.min.css" />
+    <link rel="stylesheet" href="<%=Page.ResolveUrl("~")%>assets/css/app.css">
+   
+    <%
+    If (HttpContext.Current.IsDebuggingEnabled)     
+    %>
+    <%
+    Else
+    %>
+    <%
+    EndIf 
+    %>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+
+<body>
+    <%
+    If (HttpContext.Current.IsDebuggingEnabled)     
+    %>
+    <div class="container-fluid alert-danger">
+        <small>Debugging is enabled</small>
+    </div>
+    <%
+    EndIf 
+    %>
+        <form id="form1" runat="server">
+    
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#"><i class="fas fa-chess-queen"></i> <%= PageHeading %></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/views/getcustomernumber.aspx">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Pages
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/Views/showControls.aspx">Show controls - master page</a>
+                            <a class="dropdown-item" href="/Views/ShowControlsNoMaster.aspx">Show controls - no master page</a>
+                            <a class="dropdown-item" href="/Views/DemoPostGet.aspx">Demo POST and GET</a>
+                            <a class="dropdown-item" href="/Views/TestBS4Snippets.aspx">Test BootStrap 4 snippets</a>
+                            <a class="dropdown-item" href="/Views/DBConnect.aspx">DB connect</a>
+                        </div>
+                    </li>
+                </ul>
+                <span class="navbar-text">                   
+                    <% If (Request.IsAuthenticated) %>                
+                        Welcome back, <asp:LoginName ID="LoginName1" runat="server" />&nbsp;
+                                      <asp:LoginStatus ID="LoginStatus1" cssclass="p-2" runat="server" />
+                    <% Else  %>
+                        
+                    <% EndIf %>
+                </span>
+
+            </div>
+        </nav>
+
+            <%--<form id="form1" runat="server">--%>
+                <asp:contentplaceholder id="content" runat="server">
+                </asp:contentplaceholder>
+            <%--</form>--%>
+        </form>
+
+        <script src="<%=Page.ResolveUrl("~")%>assets/vendors/jquery/jquery.min.js"></script>
+        <script src="<%=Page.ResolveUrl("~")%>assets/vendors/bootstrap/bootstrap.min.js"></script>
+
+        <asp:contentplaceholder id="pageScripts" runat="server">
+        </asp:contentplaceholder>
+
+    </body>
+</html>

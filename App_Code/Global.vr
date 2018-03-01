@@ -1,0 +1,71 @@
+﻿Using System
+Using System.Web.Routing
+Using ASNA.JsonRestRouting
+Using System.Web
+Using System.Web.Security
+
+/// <summary>
+/// Summary description for Global
+/// </summary>
+BegClass Global Access(*Public) Extends(System.Web.HttpApplication)
+
+	BegSr Application_Start
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+
+        //RegisterRoutes(RouteTable.Routes)
+	EndSr
+
+	BegSr RegisterRoutes
+        DclSrParm routes Type(RouteCollection)
+
+        //DclFld restRouter Type(ASNA.JsonRestRouting.Router) 
+        //restRouter = *New ASNA.JsonRestRouting.Router(routes) 
+
+
+        //RestRouter.Post("api/customers", "StoreCustomers", *TypeOf(CustomersController))
+	EndSr
+
+	BegSr Application_End
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+
+	EndSr
+        
+	BegSr Application_BeginRequest
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+
+	EndSr
+
+	BegSr Application_EndRequest
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+
+	EndSr
+
+	BegSr Application_Error
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+
+	EndSr
+
+	BegSr Session_Start
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+		 
+        DclFld ActiveDBNameKey  Type(*String)
+        DclFld DBName        Type(*String) 
+
+        ActiveDBNameKey = System.Configuration.ConfigurationManager.AppSettings["ActiveDBName"]
+        DBName = System.Configuration.ConfigurationManager.AppSettings[ActiveDBNameKey]
+        Session['dbname'] = DBName
+	EndSr
+
+	BegSr Session_End
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(EventArgs)
+
+	EndSr
+
+EndClass

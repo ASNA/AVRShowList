@@ -1,0 +1,147 @@
+﻿Using System
+Using System.Data
+Using System.Configuration
+Using System.Collections
+Using System.Web
+Using System.Text.RegularExpressions
+Using System.Web.Security
+Using System.Web.UI
+Using System.Web.UI.WebControls
+Using System.Web.UI.WebControls.WebParts
+Using System.Web.UI.HtmlControls
+Using System.Diagnostics
+
+BegClass Views_StateList Partial(*Yes) Access(*Public) Extends(System.Web.UI.Page)
+
+    DclDB DGDB DBName( "*PUBLIC/Cypress" )
+
+	DclFld sw Type(StopWatch) 
+	DclFld ms Type(*Integer4) 
+	  
+    BegSr Page_Load Access(*Private) Event(*This.Load)
+        DclSrParm sender Type(*Object)
+        DclSrParm e Type(System.EventArgs)
+
+        If (NOT Page.IsPostBack)
+        Else
+        EndIf
+    EndSr
+
+    BegSr Page_Unload Access(*Private) Event(*This.Unload)
+        DclSrParm sender Type(*Object)
+        DclSrParm e Type(System.EventArgs)
+
+		Disconnect DGDB 
+		Close *All 
+        //
+        // Called when the page is unloaded.
+        //
+    EndSr
+
+	BegSr LoadStateListWithClass
+		sw = *New StopWatch()
+
+		sw.Start()
+
+		
+		DclFld sl Type(StateList) 
+		sl = *New StateList(DGDB) 
+		
+//        dropdownStateList.DataSource = (*New StateList(DGDB)).GetList() 
+        
+		dropdownStateList.DataSource = sl.GetList() 
+		sw.Stop()
+		ms = sw.ElapsedMilliseconds
+		Page.Title = ms
+
+        dropdownStateList.DataBind()       
+        dropdownStateList.DataTextField = "Text"
+        dropdownStateList.DataValueField = "Value"
+	EndSr
+
+	BegSr LoadStateListWithCall
+		DclFld StateList Type(*Char) Len(2500)
+		DclFld Result Type(ListItemCollection)
+
+		sw = *New StopWatch()
+
+		sw.Start()
+
+		If NOT DGDB.IsOpen
+			Connect DGDB 
+		EndIf 
+
+		sw = *New StopWatch()
+		sw.Start()
+
+		Call 'rpmobtests/sttlist' DB(DGDB) 
+		DclParm StateList
+
+		dropdownStateList.DataSource = Parse(StateList.Trim()) 		
+		
+		sw.Stop()
+		ms = sw.ElapsedMilliseconds
+		Page.Title = ms
+
+        dropdownStateList.DataBind()       
+        dropdownStateList.DataTextField = "Text"
+        dropdownStateList.DataValueField = "Value"
+	EndSr
+
+	BegSr buttonShowSelectedState_Click Access(*Private) Event(*This.buttonShowSelectedState.Click)
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(System.EventArgs)
+
+		labelSelectedState.Text = dropdownStateList.SelectedValue		
+	EndSr
+
+
+	BegFunc Parse Type(ListItemCollection) Access(*Public) 
+		DclSrParm StringIn Type(*String) 
+
+		DclFld Result Type(ListItemCollection)
+		DclFld RowCounter Type(*Integer4) 
+
+		DclArray ValuePairs Type(*String) Rank(1) 
+		DclArray Item Type(*String) Rank(1) 
+
+		ValuePairs = Regex.Split(StringIn, '\s*;\s*') 
+
+		If ValuePairs.Length > 0 
+			
+			Result = *New ListItemCollection()
+
+			RowCounter = 0
+			ForEach ValuePair Type(*String) Collection(ValuePairs) 
+				If RowCounter > 0 
+					Item = Regex.Split(ValuePair, '\s*\|\s*') 
+					If Item.Length = 2
+						Result.Add(*New ListItem(Item[0], Item[1])) 
+					EndIf 						
+				EndIf
+				RowCounter += 1
+			EndFor 
+		EndIf 
+
+		LeaveSr Result
+	EndFunc 
+
+	BegSr buttonLoadListWithClass_Click Access(*Private) Event(*This.buttonLoadListWithClass.Click)
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(System.EventArgs)
+
+		dropdownStateList.DataSource = *Nothing
+				
+		LoadStateListWithClass()						
+	EndSr
+
+
+	BegSr buttonLoadListWithCall_Click Access(*Private) Event(*This.buttonLoadListWithCall.Click)
+		DclSrParm sender Type(*Object)
+		DclSrParm e Type(System.EventArgs)
+		
+		dropdownStateList.DataSource = *Nothing
+				
+		LoadStateListWithCall()						
+	EndSr
+EndClass

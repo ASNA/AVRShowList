@@ -1,0 +1,45 @@
+﻿#flash-message {
+    position: absolute;
+    margin-top: 180px;
+    margin-right: 40px;
+    display: none;
+}
+
+.action-row {
+    margin-top: 2rem;
+}
+
+.svg-button {
+    font-size: 200%;
+}
+
+.button-group {
+    margin-top: 2em;
+    display: flex;
+    align-items: center;
+}
+
+.big-button {
+    width: 120px;
+    height: 60px;
+    color: navy;
+    background-color: yellow;
+}
+
+input.big-test { 
+      font-size: 2em;
+}
+
+.btn {
+    margin-left: .5em;
+}
+
+.page-heading {
+    margin-top: 2em;
+    margin-bottom: 1em;
+
+}
+
+.standard-form-placement {
+    margin-top: 3rem;
+}
