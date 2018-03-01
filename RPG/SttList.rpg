@@ -1,0 +1,71 @@
+        Ctl-Opt Option(*srcstmt) Dftactgrp(*No) ActGrp('rpmobile');
+
+        // Return a delimited string of states and abbreviations. 
+        // | separates fields and ; separates records. 
+        // The first row is headings.        
+
+        Dcl-Pi *N;
+            StateList    Char(2500);
+        End-Pi;
+
+        ConfigureSQL();
+        OpenCursor();
+        StateList = ReadResults();
+        CloseCursor();
+
+        Return;
+
+        Dcl-Proc ConfigureSQL;
+            EXEC SQL
+                SET OPTION NAMING = *SYS;            
+        End-Proc;                            
+
+        Dcl-Proc OpenCursor;
+            EXEC SQL
+                DECLARE C_DOC CURSOR FOR
+                SELECT TRIM(State), Abbrev 
+                    FROM Examples.States
+                    ORDER BY State 
+                    FOR READ ONLY;
+
+            EXEC SQL
+                OPEN C_DOC;
+        End-Proc;                
+
+        Dcl-Proc ReadResults;
+            Dcl-Pi *N VarChar(2500); 
+                // Parameter list.
+            End-Pi;
+
+            Dcl-S List VarChar(2500);
+            Dcl-S MoreRows Ind;        
+            Dcl-S State Char(48);
+            Dcl-S Abbrev Char(2);
+
+            Dcl-C SUCCESS '00000';
+            Dcl-C END_OF_RESULT_SET '02000';
+
+            List = 'State|Abbrev;';
+            
+            SQLStt = SUCCESS;
+            Dou SQLStt = END_OF_RESULT_SET;
+                EXEC SQL
+                    FETCH NEXT                 
+                        FROM C_DOC
+                        INTO :State, :Abbrev;
+
+                If SQLStt = SUCCESS;
+                    List += %TRIM(State) + '|' + Abbrev + ';';                    
+                EndIf;
+            EndDo;
+
+            // Remove last semicolon.
+            List = %SUBST(List : 1 : %LEN(List) - 1);           
+
+            Return List; 
+        End-Proc;            
+
+        Dcl-Proc CloseCursor;
+            EXEC SQL 
+                CLOSE C_DOC;      
+        End-Proc;           
